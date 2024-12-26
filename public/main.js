@@ -1,4 +1,5 @@
-const API_URL = "http://localhost:3000/feed";
+// const API_URL = "http://localhost:3000/feed";
+const API_URL = "https://udu.kood2.ee/feed";
 let eatingTime = null;
 
 function getTimeInCorrectFormat(utcTimestamp) {
