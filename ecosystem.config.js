@@ -3,7 +3,7 @@ module.exports = {
     {
       name: "udu-feeder", // Name of the application
       script: "deno", // Use the Deno executable
-      args: "run --allow-net --allow-read --unstable-kv main.ts",
+      args: "run --allow-net --allow-read --unstable-kv ./main.ts",
       env: {
         DENO_ENV: "production", // Set any environment variables here
       },

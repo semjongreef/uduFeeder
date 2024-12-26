@@ -1,6 +1,7 @@
 import * as path from "jsr:@std/path";
 
-const port = 3000;
+const port = Number(Deno.env.get("PORT")) || 3200;
+
 const kv = await Deno.openKv();
 const FEED_KEY = "lastFed";
 
