@@ -71,6 +71,20 @@ function setEatingTime() {
     });
 }
 
+function calculateHungerEmoji(timeWithoutFood) {
+  const withoutFoodInSeconds = Math.floor(timeWithoutFood / 1000);
+
+  if (withoutFoodInSeconds < 7200) {
+    return "😻";
+  }
+
+  if (withoutFoodInSeconds < 14400) {
+    return "🙀";
+  }
+
+  return "😾";
+}
+
 function calculateTimeWithoutFood() {
   const now = new Date();
   const timeLastAte = new Date(eatingTime);
@@ -83,8 +97,10 @@ function calculateTimeWithoutFood() {
   );
   const seconds = Math.floor((timeWithoutFood % (1000 * 60)) / 1000);
 
+  const hungerEmoji = calculateHungerEmoji(timeWithoutFood);
+
   // Format the result as "X hours Y minutes Z seconds"
-  const timeRange = `${hours} hours ${minutes} minutes ${seconds} seconds`;
+  const timeRange = `${hours} hours ${minutes} minutes ${seconds} seconds ${hungerEmoji}`;
   const timeWithoutFoodElem = document.getElementById("timeWithoutFood");
   timeWithoutFoodElem.textContent = timeRange;
 }
