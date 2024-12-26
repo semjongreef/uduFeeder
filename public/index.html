@@ -27,8 +27,12 @@
         <h2>Udu 🐱 ate last at:</h2>
       </div>
       <!-- Time display -->
-      <div id="eatingTime" class="text-xl mt-6 font-semibold">Loading time...</div>
-      <div id="timeWithoutFood" class="text-xl mt-6 font-semibold">Loading time without food...</div>
+      <div id="eatingTime" class="text-xl mt-6 font-semibold">
+        Loading time...
+      </div>
+      <div id="timeWithoutFood" class="text-xl mt-6 font-semibold">
+        Loading time without food...
+      </div>
 
       <!-- how long without food with timer -->
       <!-- current  -->
@@ -36,7 +40,7 @@
       <button
         class="mt-6 px-8 py-3 text-white-500 bg-red-500 font-semibold rounded-lg shadow-md hover:bg-red-400 focus:outline-none focus:ring-2 focus:ring-red-4200"
         onclick="setEatingTime()"
-        >
+      >
         FEED ME 🍗
       </button>
     </div>
@@ -77,10 +81,10 @@
           .then((data) => {
             // Update the DOM with the fetched data
             const messageDiv = document.getElementById("eatingTime");
-            const time = getTimeInCorrectFormat(data.time);
             // set global eating time var
-            eatingTime = time;
-            messageDiv.textContent = eatingTime;
+            eatingTime = data.time;
+            const time = getTimeInCorrectFormat(data.time);
+            messageDiv.textContent = time;
           })
           .catch((error) => {
             // Handle errors
@@ -103,10 +107,10 @@
             if (!response.ok) {
               throw new Error("Network response was not ok");
             }
-            return response.json(); // Parse JSON response
+            return response.json();
           })
           .then((data) => {
-            console.log('data post', data);
+            console.log("data post", data);
             fetchEatingTime();
           })
           .catch((error) => {
@@ -116,6 +120,27 @@
             messageDiv.textContent = "Failed to load data.";
           });
       }
+
+      function calculateTimeWithoutFood() {
+        const now = new Date();
+        const timeLastAte = new Date(eatingTime);
+        const timeWithoutFood = now - timeLastAte;
+
+        // Calculate the difference in hours, minutes, and seconds
+        const hours = Math.floor(timeWithoutFood / (1000 * 60 * 60));
+        const minutes = Math.floor((timeWithoutFood % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeWithoutFood % (1000 * 60)) / 1000);
+
+        // Format the result as "X hours Y minutes Z seconds"
+        const timeRange = `${hours} hours ${minutes} minutes ${seconds} seconds`;
+        const timeWithoutFoodElem = document.getElementById("timeWithoutFood");
+        timeWithoutFoodElem.textContent = timeRange;
+      }
+
+      setInterval(() => {
+        calculateTimeWithoutFood();
+      }, 1000)
+
     </script>
   </body>
 </html>
