@@ -4,20 +4,18 @@ importScripts(
   "https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-sw.js"
 );
 
-const CACHE = "pwa-ufu-feeder-page";
+const CACHE_NAME = "pwa-ufu-feeder-page";
 
-// TODO: replace the following with the correct offline fallback page i.e.: const offlineFallbackPage = "offline.html";
-const offlineFallbackPage = "/public/offline.html";
+// Add whichever assets you want to pre-cache here:
+const PRECACHE_ASSETS = ["/public/assets/udu.png"];
 
-self.addEventListener("message", (event) => {
-  if (event.data && event.data.type === "SKIP_WAITING") {
-    self.skipWaiting();
-  }
-});
-
-self.addEventListener("install", async (event) => {
+// Listener for the install event - pre-caches our assets list on service worker install.
+self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE).then((cache) => cache.add(offlineFallbackPage))
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+      cache.addAll(PRECACHE_ASSETS);
+    })()
   );
 });
 

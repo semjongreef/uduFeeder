@@ -4,7 +4,7 @@
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
-  "theme_color": "#0078d7",
+  "theme_color": "#000000",
   "icons": [
     {
       "src": "/public/assets/icon-192x192.png",
@@ -18,5 +18,9 @@
     }
   ],
   "id": "udu-feeder-app",
-  "description": "App to know when can cat Udu eat."
+  "description": "App to know when can cat Udu eat.",
+  "orientation": "portrait-primary",
+  "categories": [
+    "entertainment"
+  ]
 }
