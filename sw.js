@@ -5,6 +5,7 @@ importScripts(
 );
 
 const CACHE_NAME = "pwa-ufu-feeder-page";
+const offlineFallbackPage = "/public/offline.html";
 
 // Add whichever assets you want to pre-cache here:
 const PRECACHE_ASSETS = ["/public/assets/udu.png"];
