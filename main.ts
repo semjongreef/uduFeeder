@@ -62,13 +62,20 @@ Deno.serve({ port }, async (req: Request) => {
     const file = await Deno.readFile(filePath);
     const extname = filePath.split(".").pop();
 
-    const contentType = extname === "jpg" || extname === "jpeg"
-      ? "image/jpeg"
-      : extname === "png"
-      ? "image/png"
-      : extname === "gif"
-      ? "image/gif"
-      : "application/octet-stream";
+    // Define MIME types using an object
+    const mimeTypes: Record<string, string> = {
+      "jpg": "image/jpeg",
+      "jpeg": "image/jpeg",
+      "png": "image/png",
+      "gif": "image/gif",
+      "js": "text/javascript",
+      "css": "text/css",
+      "html": "text/html",
+      "json": "application/json",
+    };
+
+    // Use the object to look up the MIME type, default to "application/octet-stream"
+    const contentType = mimeTypes[extname!] || "application/octet-stream";
 
     return new Response(file, {
       headers: {

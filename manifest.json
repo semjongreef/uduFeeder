@@ -1,0 +1,20 @@
+{
+  "name": "Udu Feeder",
+  "short_name": "Udu",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#0078d7",
+  "icons": [
+    {
+      "src": "/public/assets/icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/public/assets/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
