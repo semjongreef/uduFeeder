@@ -20,6 +20,16 @@ Deno.serve({ port }, async (req: Request) => {
       });
     }
 
+    if (url.pathname === "/offline") {
+      const html = await Deno.readFile("./public/offline.html");
+
+      return new Response(html, {
+        headers: new Headers({
+          "Content-Type": "text/html",
+        }),
+      });
+    }
+
     // API
     if (url.pathname === "/feed") {
 
