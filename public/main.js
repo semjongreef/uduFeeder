@@ -1,4 +1,4 @@
-// const API_URL = "http://localhost:3000/feed";
+// const API_URL = "http://localhost:3200/feed";
 const API_URL = "https://udu.kood2.ee/feed";
 let eatingTime = null;
 
@@ -111,3 +111,7 @@ fetchEatingTime();
 setInterval(() => {
   calculateTimeWithoutFood();
 }, 1000);
+
+setInterval(() => {
+  fetchEatingTime();
+}, 1000 * 60)

@@ -8,7 +8,7 @@ const CACHE_NAME = "pwa-ufu-feeder-page";
 const offlineFallbackPage = "/public/offline.html";
 
 // Add whichever assets you want to pre-cache here:
-const PRECACHE_ASSETS = ["/public/assets/udu.png"];
+const PRECACHE_ASSETS = ["/public/assets/udu.png", "/public/assets"];
 
 // Listener for the install event - pre-caches our assets list on service worker install.
 self.addEventListener("install", (event) => {
@@ -38,7 +38,7 @@ self.addEventListener("fetch", (event) => {
           const networkResp = await fetch(event.request);
           return networkResp;
         } catch (error) {
-          const cache = await caches.open(CACHE);
+          const cache = await caches.open(CACHE_NAME);
           const cachedResp = await cache.match(offlineFallbackPage);
           return cachedResp;
         }
