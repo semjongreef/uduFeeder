@@ -19,7 +19,7 @@
   ],
   "id": "udu-feeder-app",
   "description": "App to know when can cat Udu eat.",
-  "orientation": "portrait-primary",
+  "orientation": "portrait",
   "categories": [
     "entertainment"
   ]
