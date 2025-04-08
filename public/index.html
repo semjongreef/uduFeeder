@@ -11,6 +11,25 @@
       rel="stylesheet"
     />
     <link rel="manifest" href="/manifest.json" />
+    <style>
+        .spinner-container {
+          min-height: 432px;
+        }
+
+        .spinner {
+          width: 50px;
+          height: 50px;
+          border: 5px solid #f3f3f3;
+          border-top: 5px solid #e80e2b;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
   </head>
 
   <body
@@ -20,13 +39,8 @@
       class="flex flex-col items-center min-w-[380px] text-center px-8 rounded-lg"
     >
       <!-- Referencing image from public/assets/ folder -->
-      <div id="udu-image-container" class="w-72 h-auto shadow-md rounded-lg">
-        <img
-          id = "udu-image"
-          src="/public/assets/normal.png"
-          alt="Cat Picture"
-          class="w-72 h-auto shadow-md rounded-lg"
-        />
+      <div id="udu-image-container" class="flex justify-center items-center spinner-container w-72 h-auto shadow-md rounded-lg">
+          <div  id="udu-image" class="spinner"></div>
       </div>
 
       <div class="text-2xl mt-6 font-semibold">
