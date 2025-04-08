@@ -12,8 +12,11 @@ const offlineFallbackPage = "/public/offline.html";
 const PRECACHE_ASSETS = [
   "/public/offline.html",
   "/public/assets/udu.png",
+  "/public/assets/fat.png",
+  "/public/assets/normal.png",
+  "/public/assets/thin.png",
   "/public/assets/icon-192x192.png",
-  "/public/assets/icon-512x512.png"
+  "/public/assets/icon-512x512.png",
 ];
 
 // Listener for the install event - pre-caches our assets list on service worker install.

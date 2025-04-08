@@ -86,6 +86,33 @@ function calculateHungerEmoji(timeWithoutFood) {
   return "😾";
 }
 
+function injectUduPicture(timeWithoutFood) {
+  const withoutFoodInSeconds = Math.floor(timeWithoutFood / 1000);
+  let imageName = "thin";
+
+  if (withoutFoodInSeconds < 14400) {
+    imageName = "normal";
+  }
+
+  if (withoutFoodInSeconds < 7200) {
+    imageName = "fat";
+  }
+
+  const parentDiv = document.getElementById("udu-image-container");
+  const oldImg = document.getElementById("udu-image");
+
+  if (oldImg) {
+    parentDiv.removeChild(oldImg);
+  }
+
+  const img = document.createElement("img");
+  img.id = "udu-image"
+  img.src = `/public/assets/${imageName}.png`;
+  img.alt = `Udu ${imageName} picture`;
+
+  parentDiv.appendChild(img);
+}
+
 function calculateTimeWithoutFood() {
   const now = new Date();
   const timeLastAte = new Date(eatingTime);
@@ -99,11 +126,15 @@ function calculateTimeWithoutFood() {
   const seconds = Math.floor((timeWithoutFood % (1000 * 60)) / 1000);
 
   const hungerEmoji = calculateHungerEmoji(timeWithoutFood);
+  injectUduPicture(timeWithoutFood);
 
   // Format the result as "X hours Y minutes Z seconds"
-  const timeRange = `${hours} hours ${minutes} minutes ${seconds} seconds ${hungerEmoji}`;
-  const timeWithoutFoodElem = document.getElementById("timeWithoutFood");
+  const timeRange = `${hours} hours ${minutes} minutes ${seconds} seconds`;
+  const timeWithoutFoodElem = document.getElementById("time-without-food");
   timeWithoutFoodElem.textContent = timeRange;
+
+  const btn = document.getElementById("give-food-btn");
+  btn.textContent = `FEED ME ${hungerEmoji}`;
 }
 
 fetchEatingTime();

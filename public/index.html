@@ -20,11 +20,14 @@
       class="flex flex-col items-center min-w-[380px] text-center px-8 rounded-lg"
     >
       <!-- Referencing image from public/assets/ folder -->
-      <img
-        src="/public/assets/udu.png"
-        alt="Cat Picture"
-        class="w-72 h-auto shadow-md rounded-lg"
-      />
+      <div id="udu-image-container" class="w-72 h-auto shadow-md rounded-lg">
+        <img
+          id = "udu-image"
+          src="/public/assets/normal.png"
+          alt="Cat Picture"
+          class="w-72 h-auto shadow-md rounded-lg"
+        />
+      </div>
 
       <div class="text-2xl mt-6 font-semibold">
         <h2>Udu 🐱 ate last at:</h2>
@@ -33,7 +36,7 @@
       <div id="eatingTime" class="text-xl mt-6 font-semibold">
         Loading time...
       </div>
-      <div id="timeWithoutFood" class="text-xl mt-6 font-semibold">
+      <div id="time-without-food" class="text-xl mt-6 font-semibold">
         Loading time without food...
       </div>
 
@@ -41,10 +44,11 @@
       <!-- current  -->
       <br />
       <button
+        id="give-food-btn"
         class="mt-6 px-8 py-3 text-white-500 bg-red-500 font-semibold rounded-lg shadow-md hover:bg-red-400 focus:outline-none focus:ring-2 focus:ring-red-4200"
         onclick="setEatingTime()"
       >
-        FEED ME 🍗
+        FEED ME 😻
       </button>
     </div>
     <script src="/public/main.js"></script>
