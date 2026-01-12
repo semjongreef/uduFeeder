@@ -4,67 +4,61 @@ importScripts(
   "https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-sw.js"
 );
 
-const CACHE_NAME = "pwa-ufu-feeder-page";
-const IMAGE_CACHE_NAME = "pwa-ufu-feeder-images";
-const offlineFallbackPage = "/public/offline.html";
+// Ensure SW updates take effect without requiring manual "refresh twice".
+workbox.core.skipWaiting();
+workbox.core.clientsClaim();
 
-// Add whichever assets you want to pre-cache here:
-const PRECACHE_ASSETS = [
-  "/public/offline.html",
-  "/public/assets/udu.png",
-  "/public/assets/fat.png",
-  "/public/assets/normal.png",
-  "/public/assets/thin.png",
-  "/public/assets/icon-192x192.png",
-  "/public/assets/icon-512x512.png",
-];
-
-// Listener for the install event - pre-caches our assets list on service worker install.
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    (async () => {
-      const cache = await caches.open(CACHE_NAME);
-      await cache.addAll(PRECACHE_ASSETS);
-    })()
-  );
-});
-
+// Optional performance win for navigations.
 if (workbox.navigationPreload.isSupported()) {
   workbox.navigationPreload.enable();
 }
 
-// Cache-first strategy for images
+// Precache our "app shell" bits.
+// Note: `revision: null` means "update when the SW updates".
+const OFFLINE_URL = "/offline";
+const PRECACHE_URLS = [
+  { url: OFFLINE_URL, revision: null },
+  { url: "/public/assets/fat.png", revision: null },
+  { url: "/public/assets/normal.png", revision: null },
+  { url: "/public/assets/stress.png", revision: null },
+  { url: "/public/assets/thin.png", revision: null },
+  { url: "/public/assets/icon-192x192.png", revision: null },
+  { url: "/public/assets/icon-512x512.png", revision: null },
+];
+
+workbox.precaching.cleanupOutdatedCaches();
+workbox.precaching.precacheAndRoute(PRECACHE_URLS);
+
+// Runtime caching: images (cache-first).
 workbox.routing.registerRoute(
-  /\.(?:png|gif|jpg|jpeg|svg)$/,
+  ({ request }) => request.destination === "image",
   new workbox.strategies.CacheFirst({
-    cacheName: IMAGE_CACHE_NAME,
+    cacheName: "images-v1",
     plugins: [
+      new workbox.cacheableResponse.CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
       new workbox.expiration.ExpirationPlugin({
         maxEntries: 60,
-        maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
+        maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
       }),
     ],
   })
 );
 
-// Network-first strategy for navigation requests
-self.addEventListener("fetch", (event) => {
+// Runtime caching: navigations (network-first) with offline fallback.
+workbox.routing.registerRoute(
+  ({ request }) => request.mode === "navigate",
+  new workbox.strategies.NetworkFirst({
+    cacheName: "pages-v1",
+  })
+);
+
+workbox.routing.setCatchHandler(async ({ event }) => {
   if (event.request.mode === "navigate") {
-    event.respondWith(
-      (async () => {
-        try {
-          const preloadResp = await event.preloadResponse;
-          if (preloadResp) {
-            return preloadResp;
-          }
-          const networkResp = await fetch(event.request);
-          return networkResp;
-        } catch (error) {
-          const cache = await caches.open(CACHE_NAME);
-          const cachedResp = await cache.match(offlineFallbackPage);
-          return cachedResp;
-        }
-      })()
-    );
+    const cached = await workbox.precaching.matchPrecache(OFFLINE_URL);
+    return cached || Response.error();
   }
+
+  return Response.error();
 });
