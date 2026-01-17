@@ -1,9 +1,19 @@
 import * as path from "jsr:@std/path";
+import { DB } from "https://deno.land/x/sqlite/mod.ts";
 
 const port = Number(Deno.env.get("PORT")) || 3200;
 
-const kv = await Deno.openKv();
-const FEED_KEY = "lastFed";
+const dbPath = "./data/udu.db";
+const db = new DB(dbPath);
+
+// Create schema if it doesn't exist
+db.execute(`
+  CREATE TABLE IF NOT EXISTS feed_times (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )
+`);
 
 Deno.serve({ port }, async (req: Request) => {
   const url = new URL(req.url);
@@ -34,8 +44,11 @@ Deno.serve({ port }, async (req: Request) => {
     if (url.pathname === "/feed") {
 
       if (req.method == "GET") {
-        const lastFed = (await kv.get([FEED_KEY]))?.value;
-        const time = lastFed ? lastFed : "never";
+        const result = db.query<[string]>(
+          "SELECT timestamp FROM feed_times ORDER BY created_at DESC LIMIT 1"
+        );
+        const rows = Array.from(result);
+        const time = rows.length > 0 ? rows[0][0] : "never";
 
         const response = { time };
 
@@ -53,8 +66,8 @@ Deno.serve({ port }, async (req: Request) => {
         // Get the ISO 8601 string in UTC
         const isoTimestamp = now.toISOString();
 
-        const storageResult = await kv.set([FEED_KEY], isoTimestamp);
-        const ok = storageResult.ok;
+        db.query("INSERT INTO feed_times (timestamp) VALUES (?)", [isoTimestamp]);
+        const ok = true;
 
         const response = { ok, time: now };
 
