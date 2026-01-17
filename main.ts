@@ -4,8 +4,18 @@ import { DB } from "https://deno.land/x/sqlite/mod.ts";
 const port = Number(Deno.env.get("PORT")) || 3200;
 
 const dbPath = "./data/udu.db";
-const db = new DB(dbPath);
 
+// Init db
+try {
+  await Deno.mkdir("./data", { recursive: true });
+} catch (err) {
+  // Directory might already exist, ignore error
+  if (!(err instanceof Deno.errors.AlreadyExists)) {
+    console.error("Failed to create data directory:", err);
+  }
+}
+
+const db = new DB(dbPath);
 // Create schema if it doesn't exist
 db.execute(`
   CREATE TABLE IF NOT EXISTS feed_times (
