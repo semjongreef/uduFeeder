@@ -1,29 +1,26 @@
 import * as path from "jsr:@std/path";
-import { DB } from "https://deno.land/x/sqlite/mod.ts";
+import { Redis } from "@upstash/redis";
 
 const port = Number(Deno.env.get("PORT")) || 3200;
 
-const dbPath = "./data/udu.db";
+// Initialize Upstash Redis client
+const redis = new Redis({
+  url: Deno.env.get("REDIS_REST_URL")!,
+  token: Deno.env.get("REDIS_REST_TOKEN")!,
+});
 
-// Init db
-try {
-  await Deno.mkdir("./data", { recursive: true });
-} catch (err) {
-  // Directory might already exist, ignore error
-  if (!(err instanceof Deno.errors.AlreadyExists)) {
-    console.error("Failed to create data directory:", err);
-  }
+// Helper function to get the last feed time
+async function getLastFeedTime(): Promise<string> {
+  // ZRANGE with rev option returns array with most recent entry
+  const result = await redis.zrange("feed_times", 0, 0, { rev: true }) as string[];
+  return result.length > 0 ? result[0] : "never";
 }
 
-const db = new DB(dbPath);
-// Create schema if it doesn't exist
-db.execute(`
-  CREATE TABLE IF NOT EXISTS feed_times (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    timestamp TEXT NOT NULL,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
-  )
-`);
+// Helper function to add a new feed time
+async function addFeedTime(timestamp: string): Promise<void> {
+  const score = new Date(timestamp).getTime(); // Unix timestamp in milliseconds
+  await redis.zadd("feed_times", { score, member: timestamp });
+}
 
 Deno.serve({ port }, async (req: Request) => {
   const url = new URL(req.url);
@@ -54,17 +51,13 @@ Deno.serve({ port }, async (req: Request) => {
     if (url.pathname === "/feed") {
 
       if (req.method == "GET") {
-        const result = db.query<[string]>(
-          "SELECT timestamp FROM feed_times ORDER BY created_at DESC LIMIT 1"
-        );
-        const rows = Array.from(result);
-        const time = rows.length > 0 ? rows[0][0] : "never";
+        const time = await getLastFeedTime();
 
         const response = { time };
 
         return new Response(JSON.stringify(response), {
           headers: new Headers({
-            "Content-Type": "text/html",
+            "Content-Type": "application/json",
           }),
           status: 200,
         });
@@ -76,14 +69,14 @@ Deno.serve({ port }, async (req: Request) => {
         // Get the ISO 8601 string in UTC
         const isoTimestamp = now.toISOString();
 
-        db.query("INSERT INTO feed_times (timestamp) VALUES (?)", [isoTimestamp]);
+        await addFeedTime(isoTimestamp);
         const ok = true;
 
         const response = { ok, time: now };
 
         return new Response(JSON.stringify(response), {
           headers: new Headers({
-            "Content-Type": "text/html",
+            "Content-Type": "application/json",
           }),
           status: 200,
         });
